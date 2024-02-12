@@ -30,8 +30,10 @@ public class SignUpServlet extends CommonServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        userDao = new UserDao((SessionFactory) config.getServletContext().getAttribute("sessionFactory"));
-        sessionDao = new SessionDao((SessionFactory) config.getServletContext().getAttribute("sessionFactory"));
+        userDao =
+                new UserDao((SessionFactory) config.getServletContext().getAttribute("sessionFactory"));
+        sessionDao =
+                new SessionDao((SessionFactory) config.getServletContext().getAttribute("sessionFactory"));
     }
 
     @Override
@@ -74,10 +76,6 @@ public class SignUpServlet extends CommonServlet {
 
         userDao.save(user);
 
-        Cookie cookie = new Cookie("sessionId", session.getId().toString());
-        cookie.setMaxAge(60 * 60 * 24);
-
-        resp.addCookie(cookie);
-        resp.sendRedirect("/mainmenu");
+        sendCookieAndRedirect(session, resp);
     }
 }

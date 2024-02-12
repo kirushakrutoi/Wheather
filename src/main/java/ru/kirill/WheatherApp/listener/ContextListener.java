@@ -9,6 +9,14 @@ import ru.kirill.WheatherApp.model.Session;
 import ru.kirill.WheatherApp.util.CreateSessionFactory;
 import ru.kirill.WheatherApp.util.ThymeleafConfiguration;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
+
 @WebListener
 public class ContextListener implements ServletContextListener {
 

@@ -64,33 +64,22 @@ public class SignInServlet extends CommonServlet{
         }
 
         User user = OUser.get();
-        if(user.getSession() == null) {
-
-            if(!BCrypt.checkpw(password, user.getPassword())){
-                templateEngine.process("error", context, resp.getWriter());
-                return;
-            }
-
-            Session session = new Session(UUID.randomUUID(), new Date(), user);
-            sessionDao.save(session);
-
-            Cookie cookie = new Cookie("sessionId", session.getId().toString());
-            cookie.setMaxAge(60 * 60 * 24);
-
-            resp.addCookie(cookie);
-            resp.sendRedirect("/mainmenu");
-            return;
-        }
 
         if(!BCrypt.checkpw(password, user.getPassword())){
             templateEngine.process("error", context, resp.getWriter());
             return;
         }
 
-        Cookie cookie = new Cookie("sessionId", user.getSession().getId().toString());
-        cookie.setMaxAge(60 * 60 * 24);
+        if(user.getSession() == null) {
+            Session session = new Session(UUID.randomUUID(), new Date(), user);
+            sessionDao.save(session);
 
-        resp.addCookie(cookie);
-        resp.sendRedirect("/mainmenu");
+            sendCookieAndRedirect(session, resp);
+
+            //resp.sendRedirect("/mainmenu");
+            return;
+        }
+
+        sendCookieAndRedirect(user.getSession(), resp);
     }
 }

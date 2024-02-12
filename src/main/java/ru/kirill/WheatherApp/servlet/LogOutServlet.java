@@ -32,11 +32,6 @@ public class LogOutServlet extends CommonServlet{
 
         sessionDao.delete(deleteSession.get().getId());
 
-        Cookie cookie = new Cookie("sessionId", null);
-        cookie.setMaxAge(0);
-
-        resp.addCookie(cookie);
-
-        resp.sendRedirect("/login");
+        sendNullCookieAndRedirect(resp);
     }
 }

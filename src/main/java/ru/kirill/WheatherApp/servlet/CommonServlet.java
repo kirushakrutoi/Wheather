@@ -45,14 +45,9 @@ public class CommonServlet extends HttpServlet {
 
         Optional<Cookie> OCookie = findCookie(req);
 
-        if(OCookie.isEmpty() && path.startsWith("/signup")){
-            //resp.sendRedirect("/login");
-            return false;
-        }
+        if(OCookie.isEmpty() && path.startsWith("/signup")) return false;
 
-        if(OCookie.isEmpty() && path.startsWith("/login")){
-            return false;
-        }
+        if(OCookie.isEmpty() && path.startsWith("/login")) return false;
 
         if(OCookie.isEmpty()){
             resp.sendRedirect("/login");
@@ -63,12 +58,11 @@ public class CommonServlet extends HttpServlet {
         Optional<Session> OSession = sessionDao.show(UUID.fromString(cookie.getValue()));
 
         if(OSession.isEmpty()){
-            resp.sendRedirect("/login");
+            sendNullCookieAndRedirect(resp);
             return false;
         }
 
         return true;
-
     }
 
     protected Optional<Cookie> findCookie(HttpServletRequest req) {
@@ -79,5 +73,21 @@ public class CommonServlet extends HttpServlet {
         } catch (NullPointerException e){
             return Optional.empty();
         }
+    }
+
+    protected void sendNullCookieAndRedirect(HttpServletResponse resp) throws IOException {
+        Cookie newCookie = new Cookie("sessionId", null);
+        newCookie.setMaxAge(0);
+
+        resp.addCookie(newCookie);
+        resp.sendRedirect("/login");
+    }
+
+    protected void sendCookieAndRedirect(Session session, HttpServletResponse resp) throws IOException {
+        Cookie cookie = new Cookie("sessionId", session.getId().toString());
+        cookie.setMaxAge(60 * 60 * 24);
+
+        resp.addCookie(cookie);
+        resp.sendRedirect("/login");
     }
 }
