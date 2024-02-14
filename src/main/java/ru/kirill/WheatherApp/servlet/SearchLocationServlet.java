@@ -23,14 +23,14 @@ import java.util.Optional;
 public class SearchLocationServlet extends CommonServlet{
     private LocationDao locationDao;
     private UserDao userDao;
-    private SessionDao sessionDao;
+    //private SessionDao sessionDao;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         locationDao = new LocationDao(sessionFactory);
         userDao = new UserDao(sessionFactory);
-        sessionDao = new SessionDao(sessionFactory);
+        //sessionDao = new SessionDao(sessionFactory);
     }
 
     @Override
@@ -70,7 +70,6 @@ public class SearchLocationServlet extends CommonServlet{
 
         Location location = new Location(name, lat, lon, user);
 
-        System.out.println(lon + " " + lat);
         locationDao.save(location);
 
         resp.sendRedirect("/mainmenu");
