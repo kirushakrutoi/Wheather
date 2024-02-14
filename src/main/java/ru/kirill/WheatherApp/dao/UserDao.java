@@ -35,6 +35,7 @@ public class UserDao {
             Query<User> queryUser = session.createQuery("FROM User where email = :email", User.class);
 
             queryUser.setParameter("email", email);
+            User user = queryUser.getSingleResult();
 
             return Optional.of(queryUser.getSingleResult());
         } catch (NoResultException e){

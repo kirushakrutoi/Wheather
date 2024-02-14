@@ -13,6 +13,8 @@ import org.thymeleaf.web.IWebExchange;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 import ru.kirill.WheatherApp.dao.SessionDao;
 import ru.kirill.WheatherApp.model.Session;
+import ru.kirill.WheatherApp.model.User;
+import ru.kirill.WheatherApp.service.WheatherService;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -25,11 +27,17 @@ public class CommonServlet extends HttpServlet {
     protected SessionFactory sessionFactory;
     private SessionDao sessionDao;
 
+    protected Session session;
+    protected User user;
+
+    protected WheatherService wheatherService;
+
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         templateEngine = (ITemplateEngine) config.getServletContext().getAttribute("templateEngine");
         sessionFactory = (SessionFactory) config.getServletContext().getAttribute("sessionFactory");
+        wheatherService = new WheatherService();
         sessionDao = new SessionDao(sessionFactory);
     }
 
@@ -61,6 +69,9 @@ public class CommonServlet extends HttpServlet {
             sendNullCookieAndRedirect(resp);
             return false;
         }
+
+        this.session = OSession.get();
+        this.user = this.session.getUser();
 
         return true;
     }

@@ -7,6 +7,27 @@
 <body>
 <h1>MAin menu</h1>
 
+
+<form th:method="GET" th:action="@{/search}">
+    <div class="form-group">
+        <label for="city">City name</label>
+        <input class="form-control" id="city"  name="city">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+<br/>
+
+<div th:each="weather : ${locations}" th:if="locations ne null">
+    <a th:text="${weather.getName()}">Name</a>
+    <br/>
+    <a th:text="'Temp: ' + ${weather.getMainInfo.getTemp()} +
+    ' Feels like: ' + ${weather.getMainInfo.getFeelsLike()}">Name</a>
+    <br/>
+    <br/>
+</div>
+
+
 <form th:method="POST" th:action="@{/logout}">
     <button type="submit" class="btn btn-primary">Logout</button>
 </form>

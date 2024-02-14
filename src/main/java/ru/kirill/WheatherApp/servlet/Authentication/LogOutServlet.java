@@ -1,4 +1,4 @@
-package ru.kirill.WheatherApp.servlet;
+package ru.kirill.WheatherApp.servlet.Authentication;
 
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -9,13 +9,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.SessionFactory;
 import ru.kirill.WheatherApp.dao.SessionDao;
 import ru.kirill.WheatherApp.model.Session;
+import ru.kirill.WheatherApp.servlet.CommonServlet;
 
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
 @WebServlet(urlPatterns = "/logout")
-public class LogOutServlet extends CommonServlet{
+public class LogOutServlet extends CommonServlet {
     private SessionDao sessionDao;
 
     @Override

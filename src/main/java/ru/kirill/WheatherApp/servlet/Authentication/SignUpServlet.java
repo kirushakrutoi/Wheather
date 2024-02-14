@@ -1,4 +1,4 @@
-package ru.kirill.WheatherApp.servlet;
+package ru.kirill.WheatherApp.servlet.Authentication;
 
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -9,27 +9,32 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.SessionFactory;
 import org.mindrot.jbcrypt.BCrypt;
 import org.thymeleaf.context.WebContext;
+import org.thymeleaf.web.IWebExchange;
+import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 import ru.kirill.WheatherApp.dao.SessionDao;
 import ru.kirill.WheatherApp.dao.UserDao;
 import ru.kirill.WheatherApp.model.Session;
 import ru.kirill.WheatherApp.model.User;
+import ru.kirill.WheatherApp.servlet.CommonServlet;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
 
-@WebServlet(urlPatterns = "/login")
-public class SignInServlet extends CommonServlet{
+@WebServlet(urlPatterns = "/signup")
+public class SignUpServlet extends CommonServlet {
     private UserDao userDao;
     private SessionDao sessionDao;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        sessionFactory = (SessionFactory) config.getServletContext().getAttribute("sessionFactory");
-        userDao = new UserDao(sessionFactory);
-        sessionDao = new SessionDao(sessionFactory);
+        userDao =
+                new UserDao((SessionFactory) config.getServletContext().getAttribute("sessionFactory"));
+        sessionDao =
+                new SessionDao((SessionFactory) config.getServletContext().getAttribute("sessionFactory"));
     }
 
     @Override
@@ -37,7 +42,7 @@ public class SignInServlet extends CommonServlet{
         WebContext context = createWebContext(req, resp);
 
         if(!isAuthentication(req, resp)){
-            templateEngine.process("sign-in", context, resp.getWriter());
+            templateEngine.process("sign-up", context, resp.getWriter());
             return;
         }
 
@@ -51,35 +56,27 @@ public class SignInServlet extends CommonServlet{
         String email = req.getParameter("email");
         String password = req.getParameter("password");
 
-        if(email == null || password == null){
+        if(email == null && password == null){
             templateEngine.process("error", context, resp.getWriter());
             return;
         }
 
         Optional<User> OUser = userDao.show(email);
 
-        if(OUser.isEmpty()){
+        if(OUser.isPresent()){
             templateEngine.process("error", context, resp.getWriter());
             return;
         }
 
-        User user = OUser.get();
+        String salt = BCrypt.gensalt();
+        String hashedPassword = BCrypt.hashpw(password, salt);
 
-        if(!BCrypt.checkpw(password, user.getPassword())){
-            templateEngine.process("error", context, resp.getWriter());
-            return;
-        }
+        User user = new User(email, hashedPassword);
+        Session session = new Session(UUID.randomUUID(), new Date(), user);
+        user.setSession(session);
 
-        if(user.getSession() == null) {
-            Session session = new Session(UUID.randomUUID(), new Date(), user);
-            sessionDao.save(session);
+        userDao.save(user);
 
-            sendCookieAndRedirect(session, resp);
-
-            //resp.sendRedirect("/mainmenu");
-            return;
-        }
-
-        sendCookieAndRedirect(user.getSession(), resp);
+        sendCookieAndRedirect(session, resp);
     }
 }

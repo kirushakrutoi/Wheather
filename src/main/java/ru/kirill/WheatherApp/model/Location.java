@@ -1,9 +1,17 @@
 package ru.kirill.WheatherApp.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "locations")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Location {
 
     @Id
@@ -15,12 +23,19 @@ public class Location {
     private String name;
 
     @Column(name = "latitude")
-    private String latitude;
+    private BigDecimal latitude;
 
     @Column(name = "longitude")
-    private String longitude;
+    private BigDecimal longitude;
 
     @ManyToOne
     @JoinColumn(name = "userid", referencedColumnName = "id")
     private User user;
+
+    public Location(String name, BigDecimal latitude, BigDecimal longitude, User user) {
+        this.name = name;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.user = user;
+    }
 }
